@@ -1,5 +1,5 @@
 use BookStore;
-drop table if exists administrative_regions, administrative_units, provinces, districts, wards, Country;
+drop table if exists administrative_regions, administrative_units, provinces, districts, wards;
 
 CREATE TABLE administrative_regions (
 	id integer NOT NULL,
@@ -137,7 +137,7 @@ create table if not exists Brand(
     fulltext (BrandName)
 );
 
-create table Country (
+create table if not exists Country (
 	Id int auto_increment not null primary key,
     CountryName Varchar(100),
     ISO char(2),

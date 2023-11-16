@@ -3,7 +3,6 @@ services:
   mysql-service:
     image: mysql
     container_name: mysql-service
-    restart: always
     ports:
       - 3306:3306
     volumes:
@@ -11,3 +10,14 @@ services:
       - ./setup/data:/docker-entrypoint-initdb.d
     env_file:
       - ./setup/data/build.conf
+  redis-services:
+    image: redis/redis-stack
+    container_name: redis-service
+    ports: 
+      - 6379:6379
+      - 8001:8001
+    volumes:
+      - redis:/data
+
+volumes:
+  redis:
