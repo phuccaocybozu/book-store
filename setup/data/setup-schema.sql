@@ -1,5 +1,5 @@
 use BookStore;
-drop table if exists administrative_regions, administrative_units, provinces, districts, wards, Country;
+drop table if exists administrative_regions, administrative_units, provinces, districts, wards;
 
 CREATE TABLE administrative_regions (
 	id integer NOT NULL,
@@ -137,7 +137,7 @@ create table if not exists Brand(
     fulltext (BrandName)
 );
 
-create table Country (
+create table if not exists Country (
 	Id int auto_increment not null primary key,
     CountryName Varchar(100),
     ISO char(2),
@@ -152,7 +152,7 @@ create table if not exists Category (
 );
 
 create table if not exists Product (
-	Id int auto_increment not null,
+	Id varchar(100) not null,
     ImageURL text not null,
     Price MEDIUMINT not null,
 	ProductTitle Varchar(100) not null,
@@ -179,7 +179,7 @@ alter table Product add index product_category_idx (CategoryId) using hash;
 create table if not exists Feedback (
 	Id int auto_increment not null primary key,
     UserId int not null references UserInformation(Id) on delete cascade,
-    ProductId int not null references Product(Id) on delete cascade,
+    ProductId varchar(100) not null references Product(Id) on delete cascade,
     CommentContent text not null,
     Rate tinyint not null check (Rate>0 and Rate<6)
 );
@@ -189,7 +189,7 @@ alter table Feedback add index feedback_idx (ProductId) using hash;
 
 create table if not exists ProductImage(
 	Id int auto_increment not null primary key,
-	ProductId int not null references Product(Id) on delete cascade,
+	ProductId varchar(100) not null references Product(Id) on delete cascade,
     ImageURL text not null
 );
 
@@ -216,7 +216,7 @@ alter table OrderDetail add index order_detail_user_idx (UserId) using hash;
 
 create table if not exists OrderProductSale (
 	Id int auto_increment not null primary key,
-    ProductId int not null references Product(Id),
+    ProductId varchar(100) not null references Product(Id),
     OrderDetailId int not null references OrderDetail(Id),
     OrderQty tinyint not null
 );
