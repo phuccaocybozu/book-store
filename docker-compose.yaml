@@ -21,7 +21,7 @@ services:
   #     - redis:/data
       
   kafka-0:
-    image: bitnami/kafka
+    image: &kafka-image bitnami/kafka
     ports:
       - "9092"
     environment:
@@ -42,6 +42,11 @@ services:
       - KAFKA_CFG_TRANSACTION_STATE_LOG_MIN_ISR=2
     volumes:
       - kafka_0_data:/bitnami/kafka
+    healthcheck:
+      test: ["CMD", "kafka-topics.sh", "--bootstrap-server=localhost:9092", "--list"]
+      start_period: 15s
+      interval: 10s
+
   kafka-1:
     image: bitnami/kafka
     ports:
@@ -64,6 +69,11 @@ services:
       - KAFKA_CFG_TRANSACTION_STATE_LOG_MIN_ISR=2
     volumes:
       - kafka_1_data:/bitnami/kafka
+    healthcheck:
+      test: ["CMD", "kafka-topics.sh", "--bootstrap-server=localhost:9092", "--list"]
+      start_period: 15s
+      interval: 10s
+
   kafka-2:
     image: bitnami/kafka
     ports:
@@ -86,6 +96,10 @@ services:
       - KAFKA_CFG_TRANSACTION_STATE_LOG_MIN_ISR=2
     volumes:
       - kafka_2_data:/bitnami/kafka
+    healthcheck:
+      test: ["CMD", "kafka-topics.sh", "--bootstrap-server=localhost:9092", "--list"]
+      start_period: 15s
+      interval: 10s
 
   kafka-ui:
     # Reference: https://docs.kafka-ui.provectus.io/overview/getting-started
@@ -97,8 +111,20 @@ services:
       DYNAMIC_CONFIG_ENABLED: true
       KAFKA_CLUSTERS_0_NAME: 'kafka-ui-local'
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-1:9092, kafka-2:9092, kafka-2:9092
-    depends_on: 
-      - kafka-1
+    depends_on:
+      kafka-0:
+        condition: service_healthy
+      kafka-1:
+        condition: service_healthy
+      kafka-2:
+        condition: service_healthy
+
+  init-kafka:
+    image: *kafka-image
+    depends_on:
+      kafka-0:
+        condition: service_healthy
+    command: kafka-topics.sh --create --if-not-exists --topic book-store.email --replication-factor=3 --partitions=3 --bootstrap-server kafka-0:9092
 
 volumes:
   redis:
