@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env zsh
 source ./setup/data/build.conf && export MYSQL_ROOT_PASSWORD
 docker compose up -d
 
@@ -15,4 +15,5 @@ echo "Setup data..."
 docker exec -it mysql-service sh -c 'bin/mysql --defaults-extra-file=/docker-entrypoint-initdb.d/mysql.conf < /docker-entrypoint-initdb.d/insert-data.sql && exit'
 
 echo "Install successfully!"
-sleep 2
+sleep 5
+docker compose rm init-kafka -f
